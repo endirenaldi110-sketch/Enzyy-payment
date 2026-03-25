@@ -1,0 +1,676 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
+    <title>ENZY PAYMENT | Premium Gateway</title>
+    <!-- Font Awesome 6 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(145deg, #0a0718 0%, #03010c 100%);
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1.5rem;
+            position: relative;
+        }
+
+        body::after {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMDAiIGhlaWdodD0iMzAwIj48ZmlsdGVyIGlkPSJmIj48ZmVUdXJidWxlbmNlIHR5cGU9ImZyYWN0YWxOb2lzZSIgYmFzZUZyZXF1ZW5jeT0iLjMiIG51bU9jdGF2ZXM9IjMiLz48L2ZpbHRlcj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWx0ZXI9InVybCgjZikiIG9wYWNpdHk9IjAuMDQiLz48L3N2Zz4=');
+            background-repeat: repeat;
+            opacity: 0.2;
+            pointer-events: none;
+        }
+
+        /* SPLASH SCREEN */
+        .splash {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #02000b;
+            z-index: 2000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: opacity 0.55s ease-out;
+            opacity: 1;
+        }
+
+        .splash-content {
+            text-align: center;
+            animation: gentleRise 0.6s ease-out;
+        }
+
+        .splash-logo {
+            font-family: 'Poppins', sans-serif;
+            font-size: 2rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #c084fc, #a855f7);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .splash-spinner {
+            width: 36px;
+            height: 36px;
+            margin: 1rem auto 0;
+            border: 2px solid rgba(168, 85, 247, 0.3);
+            border-top: 2px solid #b77cff;
+            border-radius: 50%;
+            animation: spinSoft 0.9s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+        }
+
+        @keyframes spinSoft {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @keyframes gentleRise {
+            0% { opacity: 0; transform: translateY(6px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+
+        /* MAIN CARD */
+        .payment-card {
+            max-width: 560px;
+            width: 100%;
+            background: rgba(8, 5, 20, 0.78);
+            backdrop-filter: blur(14px);
+            border-radius: 2rem;
+            border: 1px solid rgba(128, 90, 210, 0.4);
+            box-shadow: 0 25px 45px -12px rgba(0, 0, 0, 0.7), 0 0 0 0.5px rgba(157, 0, 255, 0.2);
+            overflow: hidden;
+            opacity: 0;
+            transform: translateY(14px);
+            transition: opacity 0.55s cubic-bezier(0.2, 0.9, 0.3, 1), transform 0.45s ease;
+        }
+
+        .payment-card.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .card-header {
+            padding: 1.3rem 1.5rem 0.4rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            flex-wrap: wrap;
+            border-bottom: 1px solid rgba(157, 0, 255, 0.2);
+        }
+
+        .title h2 {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 700;
+            font-size: 1.55rem;
+            background: linear-gradient(125deg, #e2c6ff, #b77cff);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .title p {
+            font-size: 0.65rem;
+            color: #a48ad6;
+            margin-top: 2px;
+        }
+
+        .badge {
+            background: rgba(128, 0, 255, 0.2);
+            padding: 0.2rem 0.8rem;
+            border-radius: 30px;
+            font-size: 0.65rem;
+            font-weight: 500;
+            color: #c6a8ff;
+            border: 0.5px solid #6b2fe0;
+        }
+
+        /* QR Area */
+        .qr-area {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 1.3rem 1.5rem 0.5rem;
+        }
+
+        .qr-box {
+            background: #0c0720;
+            padding: 0.7rem;
+            border-radius: 1.5rem;
+            box-shadow: 0 8px 20px -8px rgba(0, 0, 0, 0.5);
+            border: 1px solid #3a2a6a;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s;
+        }
+
+        .qr-box:hover {
+            transform: scale(1.02);
+            box-shadow: 0 12px 24px -10px rgba(0, 0, 0, 0.6);
+        }
+
+        .qr-box img {
+            width: 180px;
+            height: auto;
+            display: block;
+            border-radius: 1rem;
+            background: white;
+            pointer-events: none;
+        }
+
+        .dana-info {
+            margin-top: 1rem;
+            background: #0f0925;
+            border-radius: 2rem;
+            padding: 0.45rem 1.2rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.7rem;
+            font-weight: 500;
+            border: 0.5px solid #5b3dae;
+        }
+
+        .dana-info i {
+            color: #c084fc;
+            font-size: 0.95rem;
+        }
+
+        .dana-info span {
+            font-size: 0.9rem;
+            color: #e3d6ff;
+        }
+
+        .owner {
+            font-size: 0.7rem;
+            color: #b294ff;
+            background: rgba(0, 0, 0, 0.35);
+            padding: 0.2rem 1rem;
+            border-radius: 20px;
+            margin-top: 0.5rem;
+        }
+
+        .click-hint {
+            font-size: 0.6rem;
+            margin-top: 0.5rem;
+            color: #9b83cc;
+        }
+
+        /* MUSIC PLAYER SECTION */
+        .music-section {
+            margin: 0.5rem 1.2rem 0.8rem;
+            background: rgba(0, 0, 0, 0.45);
+            border-radius: 1.5rem;
+            padding: 0.8rem;
+            border: 0.5px solid #4a3680;
+        }
+
+        .music-header {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: #d0b5ff;
+            margin-bottom: 0.8rem;
+        }
+
+        .music-header i {
+            font-size: 0.9rem;
+            color: #b77cff;
+        }
+
+        .track-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.7rem;
+        }
+
+        .track-item {
+            background: rgba(15, 9, 37, 0.7);
+            border-radius: 2rem;
+            padding: 0.5rem 0.8rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            transition: 0.2s;
+            border: 0.5px solid #352b60;
+        }
+
+        .track-info {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            flex: 2;
+        }
+
+        .track-icon {
+            width: 28px;
+            text-align: center;
+            color: #c084fc;
+        }
+
+        .track-name {
+            font-size: 0.8rem;
+            font-weight: 500;
+            color: #f0e6ff;
+        }
+
+        .play-btn {
+            background: linear-gradient(95deg, #5b21b6, #8b5cf6);
+            border: none;
+            border-radius: 2rem;
+            padding: 0.35rem 1rem;
+            color: white;
+            font-size: 0.7rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .play-btn:hover {
+            background: linear-gradient(95deg, #6d28d9, #a855f7);
+            transform: scale(0.97);
+        }
+
+        .play-btn.playing {
+            background: #2b2050;
+            color: #c9abff;
+        }
+
+        .global-controls {
+            display: flex;
+            justify-content: flex-end;
+            gap: 0.6rem;
+            margin-top: 0.8rem;
+            padding-top: 0.5rem;
+            border-top: 0.5px solid #352b60;
+        }
+
+        .ctrl-btn {
+            background: rgba(128, 0, 255, 0.25);
+            border: none;
+            border-radius: 2rem;
+            padding: 0.3rem 0.9rem;
+            font-size: 0.65rem;
+            color: #cdb3ff;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        .ctrl-btn:hover {
+            background: rgba(128, 0, 255, 0.45);
+        }
+
+        /* Rules Panel */
+        .rules-panel {
+            background: rgba(5, 2, 18, 0.7);
+            margin: 0.2rem 1.2rem 1rem;
+            border-radius: 1.5rem;
+            padding: 1rem 1.2rem;
+            border-left: 3px solid #a855f7;
+        }
+
+        .rules-header {
+            font-weight: 700;
+            font-size: 0.8rem;
+            color: #d9c5ff;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.6rem;
+        }
+
+        .rules-scroll {
+            max-height: 250px;
+            overflow-y: auto;
+            padding-right: 4px;
+            font-size: 0.68rem;
+            color: #cfbef5;
+            line-height: 1.45;
+        }
+
+        .rules-scroll::-webkit-scrollbar {
+            width: 3px;
+        }
+        .rules-scroll::-webkit-scrollbar-track {
+            background: #241d3a;
+            border-radius: 10px;
+        }
+        .rules-scroll::-webkit-scrollbar-thumb {
+            background: #a073e0;
+            border-radius: 10px;
+        }
+
+        .rule-item {
+            margin-bottom: 0.45rem;
+            padding-left: 0.6rem;
+            border-left: 1px solid #54448b;
+        }
+
+        .rule-item strong {
+            color: #dcbfff;
+        }
+
+        .note-box {
+            background: #120c29;
+            padding: 0.55rem;
+            border-radius: 1rem;
+            margin-top: 0.7rem;
+            font-size: 0.64rem;
+            color: #cfbef5;
+            border: 0.5px solid #3d2d70;
+        }
+
+        .info-footer {
+            padding: 0.5rem 1.5rem 1rem;
+            text-align: center;
+        }
+
+        .info-message {
+            background: rgba(0, 0, 0, 0.35);
+            border-radius: 2rem;
+            padding: 0.6rem;
+            font-size: 0.68rem;
+            color: #c7aeff;
+        }
+
+        footer {
+            font-size: 0.55rem;
+            text-align: center;
+            padding: 0.7rem;
+            color: #6c5996;
+            border-top: 1px solid #2d234b;
+        }
+
+        /* Modal QR besar */
+        .qr-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(10px);
+            z-index: 3000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            visibility: hidden;
+            opacity: 0;
+            transition: visibility 0.2s, opacity 0.25s ease;
+            cursor: pointer;
+        }
+
+        .qr-modal.active {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        .modal-content {
+            max-width: 85vw;
+            max-height: 85vh;
+            background: #0f0925;
+            padding: 1rem;
+            border-radius: 2rem;
+            border: 1px solid #b77cff;
+            animation: zoomIn 0.2s ease-out;
+        }
+
+        .modal-content img {
+            width: 100%;
+            height: auto;
+            border-radius: 1.2rem;
+        }
+
+        @keyframes zoomIn {
+            from { transform: scale(0.92); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        @media (max-width: 500px) {
+            .qr-box img { width: 150px; }
+            .track-item { flex-direction: column; align-items: stretch; }
+            .play-btn { justify-content: center; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="splash" id="splashScreen">
+    <div class="splash-content">
+        <div class="splash-logo">ENZY·PAYMENT</div>
+        <div class="splash-spinner"></div>
+        <div style="margin-top: 12px; font-size: 0.7rem; color: #aa86ff;">WELCOME</div>
+    </div>
+</div>
+
+<div class="payment-card" id="mainCard">
+    <div class="card-header">
+        <div class="title">
+            <h2>ENZY·PAYMENT</h2>
+            <p>premium gateway</p>
+        </div>
+        <div class="badge"><i class="fas fa-gem"></i> ENZY ZONE</div>
+    </div>
+
+    <!-- QR -->
+    <div class="qr-area">
+        <div class="qr-box" id="qrClickable">
+            <img src="https://files.catbox.moe/90xu7v.jpg" alt="QRIS ENZY" id="qrImage">
+        </div>
+        <div class="dana-info">
+            <i class="fas fa-mobile-alt"></i>
+            <span>0881010591301</span>
+            <i class="fas fa-check-circle" style="color:#b77cff; font-size:0.7rem;"></i>
+        </div>
+        <div class="owner">
+            <i class="fas fa-user-astronaut"></i> a.n Muslih
+        </div>
+        <div class="click-hint">
+            <i class="fas fa-expand-alt"></i> klik QR untuk memperbesar
+        </div>
+    </div>
+
+    <!-- MUSIC PLAYER (3 LAGU) -->
+    <div class="music-section">
+        <div class="music-header">
+            <i class="fas fa-headphones"></i> <span>ENZY SOUNDTRACK</span>
+        </div>
+        <div class="track-list" id="trackList">
+            <div class="track-item" data-url="http://i.top4top.io/m_3707rb6ox1.mp3" data-name="Kasih Aba-Aba">
+                <div class="track-info">
+                    <div class="track-icon"><i class="fas fa-music"></i></div>
+                    <div class="track-name">Kasih Aba-Aba</div>
+                </div>
+                <button class="play-btn" data-track="0"><i class="fas fa-play"></i> Putar</button>
+            </div>
+            <div class="track-item" data-url="http://f.top4top.io/m_3642afcsx1.mp3" data-name="So Asu">
+                <div class="track-info">
+                    <div class="track-icon"><i class="fas fa-drumstick-bite"></i></div>
+                    <div class="track-name">So Asu</div>
+                </div>
+                <button class="play-btn" data-track="1"><i class="fas fa-play"></i> Putar</button>
+            </div>
+            <div class="track-item" data-url="http://h.top4top.io/m_3642leyxa1.mp3" data-name="Bintang 5">
+                <div class="track-info">
+                    <div class="track-icon"><i class="fas fa-star"></i></div>
+                    <div class="track-name">Bintang 5</div>
+                </div>
+                <button class="play-btn" data-track="2"><i class="fas fa-play"></i> Putar</button>
+            </div>
+        </div>
+        <div class="global-controls">
+            <button id="stopAllBtn" class="ctrl-btn"><i class="fas fa-stop-circle"></i> Stop</button>
+        </div>
+    </div>
+
+    <!-- RULES PANEL -->
+    <div class="rules-panel">
+        <div class="rules-header">
+            <i class="fas fa-shield-haltered"></i> ⚡ RULES ISIAN ADMIN ENZY ⚡
+        </div>
+        <div class="rules-scroll">
+            <div class="rule-item"><strong>HTTPS=</strong> HAYATO ALOK KELLY CAROLINE</div>
+            <div class="rule-item"><strong>PET=</strong> FALCO/G PUNYA KOSONGIN (SELAIN ITU DIS)</div>
+            <div class="rule-item"><strong>SALAH ROM?</strong> BISA RM,KLO DAH DEMEG GA BISA</div>
+            <div class="rule-item"><strong>WAJIB SS00 + SS WIN</strong></div>
+            <div class="rule-item"><strong>BUNDLE TERLARANG :</strong> BENCONG,TUNG TUNG,HIU</div>
+            <div class="rule-item"><strong>DIS?REC</strong> JANGAN BACOT</div>
+            <div class="rule-item"><strong>SS00? MENGHADAP BASE MUSUH,JONGKOK AND BERDIRI</strong></div>
+            <div class="rule-item"><strong>CHAR CWE DIS TOLOL KLOO DAH DEMEG</strong></div>
+            <div class="rule-item"><strong>SG DI LARANG : METE AND EVO,PUNYA?REC,REC SEBELUM MAIN</strong></div>
+            <div class="rule-item"><strong>11/22 NO ZONA | 33/44 BOLEH</strong></div>
+            <div class="rule-item"><strong>NO LT 2,NO ATAP | NO TINJU,TINJU?DIS</strong></div>
+            <div class="rule-item"><strong>NO USP,SELAIN AFK | PURA PURA AFK?DIS</strong></div>
+            <div class="rule-item"><strong>NO HOLO | NO PANEL | NO CIT | NO BUG GLOWAL MINI | NO REGE | NO SCRIP</strong></div>
+            <div class="rule-item"><strong>CONFIG?</strong> CONFIG BUNDLE DIS,CONFIG SG BOLEH</div>
+            <div class="rule-item"><strong>SURCIN?DIS TOLOL</strong></div>
+            <div class="rule-item"><strong>*CARA OPR?*</strong> ROM CRAZY | LOADOUT OFF | AIDROP OFF | AMMO TAK TERBATAS | COIN 1500 | ROUNDE 13</div>
+            <div class="rule-item"><strong>RULES ALL KAYU:</strong> =ATTRIBUTE OFF/SEMUA P PAKEK KAYU</div>
+            <div class="rule-item"><strong>RULES BALL:</strong> ALL PLAYER KIRIM SS00,SS00 GA BOLEH BEDA HUD | NO GANTI AKUN</div>
+            <div class="rule-item"><strong>RULES NVMT:</strong> MAIN NVMT YG GAADA EVMET SS AJA YG ADA EVO,METEOR WAJIB REC</div>
+            <div class="note-box">
+                🚫NO BUKTI TF=HANGUS | 🚫TF KELEBIHAN=HANGUS<br>
+                ‼️ADMIN HANYA BISA TF KE DANA<br>
+                ‼️TRX BATAL FEE TETEP KEPOTONG<br>
+                ‼️KIK MUSUH SEBELUM ADMIN TF DICUT 1K<br>
+                ‼️SPAM ADMIN/TELPON 3X CUT 1K<br>
+                <strong>HARUS SABAR SAAT ADMIN GA RESPON</strong>
+            </div>
+        </div>
+    </div>
+
+    <div class="info-footer">
+        <div class="info-message">
+            <i class="fas fa-info-circle"></i> Scan QR atau transfer ke DANA 0881010591301 a.n Muslih.<br>
+            Lampirkan bukti transfer + SS00 & SS WIN. Sabar, admin ada kesibukan.
+        </div>
+    </div>
+    <footer>
+        <i class="fas fa-database"></i> ENZY PAYMENT • BACA RULES SEBELUM TF
+    </footer>
+</div>
+
+<!-- MODAL QR -->
+<div id="qrModal" class="qr-modal">
+    <div class="modal-content">
+        <img src="https://files.catbox.moe/90xu7v.jpg" alt="QR Besar">
+    </div>
+</div>
+
+<script>
+    // SPLASH
+    const splashDiv = document.getElementById('splashScreen');
+    const mainCard = document.getElementById('mainCard');
+    setTimeout(() => {
+        if(splashDiv) {
+            splashDiv.style.opacity = '0';
+            setTimeout(() => {
+                splashDiv.style.display = 'none';
+                mainCard.classList.add('visible');
+            }, 500);
+        }
+    }, 2000);
+
+    // QR MODAL
+    const qrBox = document.getElementById('qrClickable');
+    const qrModal = document.getElementById('qrModal');
+    qrBox.addEventListener('click', () => qrModal.classList.add('active'));
+    qrModal.addEventListener('click', (e) => {
+        if(e.target === qrModal || e.target.classList.contains('qr-modal')) qrModal.classList.remove('active');
+    });
+    document.addEventListener('keydown', (e) => { if(e.key === 'Escape' && qrModal.classList.contains('active')) qrModal.classList.remove('active'); });
+
+    // MUSIC PLAYER
+    const tracks = [
+        { url: "http://i.top4top.io/m_3707rb6ox1.mp3", name: "Kasih Aba-Aba" },
+        { url: "http://f.top4top.io/m_3642afcsx1.mp3", name: "So Asu" },
+        { url: "http://h.top4top.io/m_3642leyxa1.mp3", name: "Bintang 5" }
+    ];
+    let currentAudio = null;
+    let currentTrackIndex = -1;
+
+    const playBtns = document.querySelectorAll('.play-btn');
+    const stopAllBtn = document.getElementById('stopAllBtn');
+
+    function stopAllMusic() {
+        if(currentAudio) {
+            currentAudio.pause();
+            currentAudio.currentTime = 0;
+            currentAudio = null;
+        }
+        // reset semua tombol ke tampilan default
+        playBtns.forEach(btn => {
+            btn.innerHTML = '<i class="fas fa-play"></i> Putar';
+            btn.classList.remove('playing');
+        });
+        currentTrackIndex = -1;
+    }
+
+    function playTrack(index) {
+        if(currentTrackIndex === index && currentAudio && !currentAudio.paused) {
+            // pause if same track playing
+            currentAudio.pause();
+            playBtns[index].innerHTML = '<i class="fas fa-play"></i> Putar';
+            playBtns[index].classList.remove('playing');
+            currentTrackIndex = -1;
+            currentAudio = null;
+            return;
+        }
+        // stop yang sedang berjalan
+        stopAllMusic();
+        const track = tracks[index];
+        const audio = new Audio(track.url);
+        audio.addEventListener('ended', () => {
+            // setelah selesai, reset tombol
+            if(playBtns[index]) {
+                playBtns[index].innerHTML = '<i class="fas fa-play"></i> Putar';
+                playBtns[index].classList.remove('playing');
+            }
+            if(currentAudio === audio) currentAudio = null;
+            currentTrackIndex = -1;
+        });
+        audio.play().catch(e => console.log("Autoplay mungkin diblokir, coba klik lagi"));
+        currentAudio = audio;
+        currentTrackIndex = index;
+        playBtns[index].innerHTML = '<i class="fas fa-pause"></i> Putar';
+        playBtns[index].classList.add('playing');
+    }
+
+    playBtns.forEach((btn, idx) => {
+        btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            playTrack(idx);
+        });
+    });
+
+    stopAllBtn.addEventListener('click', () => stopAllMusic());
+</script>
+</body>
+</html>
